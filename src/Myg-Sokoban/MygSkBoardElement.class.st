@@ -31,9 +31,11 @@ Class {
 	#superclass : 'BlElement',
 	#instVars : [
 		'board',
+		'moveLabel',
 		'backgroundLayer',
 		'foregroundLayer',
-		'directionDict'
+		'directionDict',
+		'space'
 	],
 	#category : 'Myg-Sokoban-UI',
 	#package : 'Myg-Sokoban',
@@ -315,7 +317,16 @@ MygSkBoardElement >> manageEvent: anEvent [
 	
 	moved := player move: direction.
 
-	
+	moved ifTrue: [
+    player board gameManager
+        currentMoveCount: player board gameManager currentMoveCount + 1.
+
+].
+moved ifTrue: [
+    self board moveCount: self board moveCount + 1.
+    moveLabel text: ('Moves: ', self board moveCount asString) asRopedText
+].
+
 
 	(moved and: [ neighborElement box class = MygSkBox ])
 		ifTrue: [
@@ -331,18 +342,22 @@ MygSkBoardElement >> manageEvent: anEvent [
 { #category : 'opening' }
 MygSkBoardElement >> openWithModel: aSkBoard [
 
-	| space |
-	space := BlSpace new.
-	space
-		extent: 500 asPoint;
-		resizable: false.
-	space root addChild: self.
+    "不要写 | space | 这一行！！"
+    "这里直接给实例变量 space 赋值"
+    space := BlSpace new.
+    space extent: 500 @ 500.
+    space resizable: false.
 
-	self board: aSkBoard.
+    space root layout: BlFrameLayout new.
+    space root addChild: self.
 
-	space root background: Color red muchLighter.
-	space root layout: BlFrameLayout new.
-	space show
+    self board: aSkBoard.
+
+ moveLabel := BlTextElement new.
+moveLabel text: 'Moves: 0' asRopedText.
+    space root addChild: moveLabel.
+
+    space show.
 ]
 
 { #category : 'initialization' }
@@ -356,4 +371,10 @@ MygSkBoardElement >> resetBoard [
 MygSkBoardElement >> updateElements: anOrderedCollection [
 
 	anOrderedCollection do: [ :each | each boxForForeground updateBackgroundColor ]
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoardElement >> updateMoveLabel [
+    moveLabel text: ('Moves: ', self board moveCount asString) asRopedText.
+
 ]

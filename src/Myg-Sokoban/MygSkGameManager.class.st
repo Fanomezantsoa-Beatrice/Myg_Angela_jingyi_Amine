@@ -7843,9 +7843,8 @@ MygSkGameManager >> currentLevelString: aString [
 ]
 
 { #category : 'accessing' }
-MygSkGameManager >> currentMoveCount [ 
-	
-	^ currentMoveCount 
+MygSkGameManager >> currentMoveCount [
+    ^ self currentBoardElement board moveCount
 ]
 
 { #category : 'accessing' }

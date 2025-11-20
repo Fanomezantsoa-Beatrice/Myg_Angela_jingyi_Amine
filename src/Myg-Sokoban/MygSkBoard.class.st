@@ -18,6 +18,7 @@ Class {
 	#instVars : [
 		'player',
 		'boxes',
+		'moveCount',
 		'ended',
 		'gameManager'
 	],
@@ -178,13 +179,30 @@ MygSkBoard >> initialize [
 
 	super initialize.
 	ended := false.
-	boxes := OrderedCollection new
+	boxes := OrderedCollection new.
+	moveCount := 0.
+	
+	
 ]
 
 { #category : 'testing' }
 MygSkBoard >> isFinished [
 
 	^ self boxes allSatisfy: [ :each | each background isTarget ]
+]
+
+{ #category : 'accessing' }
+MygSkBoard >> moveCount [
+    ^ moveCount
+
+
+]
+
+{ #category : 'accessing' }
+MygSkBoard >> moveCount: aNumber [
+    moveCount := aNumber
+
+
 ]
 
 { #category : 'move' }
