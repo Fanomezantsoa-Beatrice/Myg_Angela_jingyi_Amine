@@ -7858,6 +7858,7 @@ MygSkGameManager >> initialize [
 
 	super initialize.
 	currentMoveCount := 0.
+	MygSkTarget resetCounter.
 	self initializePackDictionary
 ]
 
