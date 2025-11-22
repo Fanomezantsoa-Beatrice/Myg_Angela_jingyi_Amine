@@ -181,6 +181,7 @@ MygSkBoard >> initialize [
 	ended := false.
 	boxes := OrderedCollection new.
 	moveCount := 0.
+	MygSkTarget resetCounter.
 	
 	
 ]

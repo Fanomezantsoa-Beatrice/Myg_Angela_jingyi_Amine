@@ -2,26 +2,27 @@
 This class contains tests
 "
 Class {
-	#name : #MygSkGameLogic,
-	#superclass : #TestCase,
+	#name : 'MygSkGameLogic',
+	#superclass : 'TestCase',
 	#instVars : [
 		'board'
 	],
-	#category : #'Myg-Sokoban-Tests'
+	#category : 'Myg-Sokoban-Tests',
+	#package : 'Myg-Sokoban-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 MygSkGameLogic >> setUp [
 
 	super setUp.
-	
+	MygSkTarget resetCounter.
 	board := MygSkBoard createWithBoard:
 		         ((MygLevelImporter
 			          fromString: '#@$ . #'
 			          fromPackage: MygSkBoard package) do: [ :each | each configured ]).
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 MygSkGameLogic >> testIsFinished [
 
 	self deny: board isFinished.
@@ -30,7 +31,7 @@ MygSkGameLogic >> testIsFinished [
 	self assert: board isFinished
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 MygSkGameLogic >> testIsFinishedThenUnfinish [
 
 	self deny: board isFinished.
@@ -41,7 +42,7 @@ MygSkGameLogic >> testIsFinishedThenUnfinish [
 	self deny: board isFinished
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 MygSkGameLogic >> testMoveSteps [
 
 	self deny: board isFinished.
@@ -49,4 +50,25 @@ MygSkGameLogic >> testMoveSteps [
 			CpDirection east.
 			CpDirection east }.
 	self assert: board isFinished
+]
+
+{ #category : 'tests' }
+MygSkGameLogic >> testMultipleTargetsHaveIncrementedNumbers [
+	"Test that multiple targets have incremented numbers"
+	| target1 target2 target3 |
+	
+	Transcript show: '==> Test starting'; cr.
+	
+	target1 := MygSkTarget new.
+	Transcript show: 'target1 number: ', target1 number asString; cr.
+	
+	target2 := MygSkTarget new.
+	Transcript show: 'target2 number: ', target2 number asString; cr.
+	
+	target3 := MygSkTarget new.
+	Transcript show: 'target3 number: ', target3 number asString; cr.
+	
+	self assert: target1 number equals: 1.
+	self assert: target2 number equals: 2.
+	self assert: target3 number equals: 3
 ]

@@ -61,23 +61,38 @@ MygSkTarget class >> textualMapCharacter [
 
 { #category : 'accessing' }
 MygSkTarget >> backgroundRepresentation [
-	"Return a Form (image) with the number drawn on it"
-	| baseIcon form canvas textPosition |
+	| baseIcon bigForm canvas textPosition font text fontSize offset |
 	
 	baseIcon := MygSkBoxElement targetIcon.
-	form := baseIcon copy.  "Copy to not modify the original"
+	bigForm := baseIcon scaledIntoFormOfSize: 200@200.
+	fontSize := bigForm height // 2.
 	
-	"Draw the number on the form"
-	canvas := FormCanvas on: form.
-	textPosition := (form width // 2 - 8) @ (form height // 2 - 10).
+	font := (LogicalFont familyName: 'Arial' pointSize: fontSize) emphasized: 1.
+	text := number asString.
 	
+	textPosition := ((bigForm width - (font widthOfString: text)) // 2) 
+	                @ ((bigForm height - font height) // 2).
+	
+	canvas := FormCanvas on: bigForm.
+	
+	"Dessiner le texte plusieurs fois avec des décalages pour simuler du gras"
+	-2 to: 2 do: [ :dx |
+		-2 to: 2 do: [ :dy |
+			offset := dx @ dy.
+			canvas 
+				drawString: text
+				at: textPosition + offset
+				font: font
+				color: Color black ] ].
+	
+	"Dessiner le texte final en jaune vif par-dessus"
 	canvas 
-		drawString: number asString
+		drawString: text
 		at: textPosition
-		font: (LogicalFont familyName: 'Arial' pointSize: 18)
-		color: Color white.
+		font: font
+		color: Color yellow.
 	
-	^ form
+	^ bigForm
 ]
 
 { #category : 'accessing' }
