@@ -213,6 +213,14 @@ MygSkBoard >> moveSteps: aCollectionOfDirection [
 ]
 
 { #category : 'accessing' }
+MygSkBoard >> nextTargetNumberToFill [
+	"Returns the number of the next target that should be filled"
+	| filledTargets |
+	filledTargets := self boxes select: [ :box | box background isTarget ].
+	^ filledTargets size + 1
+]
+
+{ #category : 'accessing' }
 MygSkBoard >> player [
 	^ player
 ]
@@ -258,7 +266,6 @@ MygSkBoard >> setPlayer [
 { #category : 'move' }
 MygSkBoard >> updatePositionOf: aSkMovable from: previousPosition [
 	"Put back the previous position element."
-
 	self
 		atColumn: previousPosition x
 		atRow: previousPosition y

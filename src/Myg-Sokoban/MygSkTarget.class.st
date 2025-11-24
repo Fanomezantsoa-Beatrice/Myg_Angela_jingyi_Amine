@@ -61,38 +61,65 @@ MygSkTarget class >> textualMapCharacter [
 
 { #category : 'accessing' }
 MygSkTarget >> backgroundRepresentation [
-	| baseIcon bigForm canvas textPosition font text fontSize offset |
+    | baseIcon bigForm canvas textPosition font text fontSize textWidth textHeight |
+
+    baseIcon := MygSkBoxElement targetIcon.
+    bigForm := baseIcon scaledIntoFormOfSize: 200@200.
+
+    text := number asString.
+
+    "Start with large font size and shrink until it fits"
+    fontSize := bigForm height.
+    [
+        font := (LogicalFont familyName: 'Arial' pointSize: fontSize) emphasized: 2.
+        textWidth := font widthOfString: text.
+        textHeight := font ascent.
+        (textWidth > bigForm width or: [ textHeight > bigForm height ])
+    ] whileTrue: [ fontSize := fontSize - 2 ].
+
+    textPosition := ((bigForm width - textWidth) // 2)
+                    @ ((bigForm height - textHeight) // 2).
+
+    canvas := FormCanvas on: bigForm.
+
+    "Thicker black outline"
+    -3 to: 3 do: [ :dx |
+        -3 to: 3 do: [ :dy |
+            canvas 
+                drawString: text
+                at: textPosition + (dx @ dy)
+                font: font
+                color: Color black ] ].
+
+    "Main text in bright white or yellow"
+    canvas 
+        drawString: text
+        at: textPosition
+        font: font
+        color: Color white.  "or Color yellow"
+
+    ^ bigForm
+
+]
+
+{ #category : 'action' }
+MygSkTarget >> bringIn: aSkMovable going: aDirection [
+	"Only accept boxes if they come in the correct order"
+	<action>
+	| nextTargetToFill |
 	
-	baseIcon := MygSkBoxElement targetIcon.
-	bigForm := baseIcon scaledIntoFormOfSize: 200@200.
-	fontSize := bigForm height // 2.
+	"Check if it's a box trying to enter"
+	aSkMovable class = MygSkBox ifFalse: [ 
+		^ super bringIn: aSkMovable going: aDirection ].
 	
-	font := (LogicalFont familyName: 'Arial' pointSize: fontSize) emphasized: 1.
-	text := number asString.
+	"Get the next target number that should be filled"
+	nextTargetToFill := self board nextTargetNumberToFill.
 	
-	textPosition := ((bigForm width - (font widthOfString: text)) // 2) 
-	                @ ((bigForm height - font height) // 2).
+	"If this is not the next target, block the move"
+	self number ~= nextTargetToFill ifTrue: [ ^ false ].
 	
-	canvas := FormCanvas on: bigForm.
-	
-	"Dessiner le texte plusieurs fois avec des décalages pour simuler du gras"
-	-2 to: 2 do: [ :dx |
-		-2 to: 2 do: [ :dy |
-			offset := dx @ dy.
-			canvas 
-				drawString: text
-				at: textPosition + offset
-				font: font
-				color: Color black ] ].
-	
-	"Dessiner le texte final en jaune vif par-dessus"
-	canvas 
-		drawString: text
-		at: textPosition
-		font: font
-		color: Color yellow.
-	
-	^ bigForm
+	"Otherwise, allow the move"
+	^ super bringIn: aSkMovable going: aDirection
 ]
 
 { #category : 'accessing' }
