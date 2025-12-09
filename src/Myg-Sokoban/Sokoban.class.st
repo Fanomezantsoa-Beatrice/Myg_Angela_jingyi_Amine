@@ -131,7 +131,6 @@ Sokoban class >> menuLevel [
 
 { #category : 'opening' }
 Sokoban class >> open [
-
 	<script>
 	| space container levelMenu helpMenu bar title paging |
 	levelMenu := self menuLevel.
@@ -149,13 +148,12 @@ Sokoban class >> open [
 			bar.
 			title.
 			paging }.
-
 	bar addItem: levelMenu.
 	bar addItem: helpMenu.
-
 	space := BlSpace new.
 	space root addChild: container.
-	space extent: 1000 @ 1000.
+	space extent: 1400 @ 1200.  "Plus grande : était 1000@1000"
+	space resizable: true.       "AJOUTEZ CETTE LIGNE - permet de redimensionner"
 	space show
 ]
 

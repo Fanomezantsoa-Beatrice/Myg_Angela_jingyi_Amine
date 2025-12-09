@@ -181,6 +181,7 @@ MygSkBoard >> initialize [
 	ended := false.
 	boxes := OrderedCollection new.
 	moveCount := 0.
+	MygSkTarget resetCounter.
 	
 	
 ]
@@ -209,6 +210,14 @@ MygSkBoard >> moveCount: aNumber [
 MygSkBoard >> moveSteps: aCollectionOfDirection [
 
 	aCollectionOfDirection do: [ :each | player move: each ]
+]
+
+{ #category : 'accessing' }
+MygSkBoard >> nextTargetNumberToFill [
+	"Returns the number of the next target that should be filled"
+	| filledTargets |
+	filledTargets := self boxes select: [ :box | box background isTarget ].
+	^ filledTargets size + 1
 ]
 
 { #category : 'as yet unclassified' }
