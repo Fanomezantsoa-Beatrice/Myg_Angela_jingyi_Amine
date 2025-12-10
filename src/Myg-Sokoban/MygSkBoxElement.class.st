@@ -31,7 +31,8 @@ Class {
 	#instVars : [
 		'box',
 		'board',
-		'positionInField'
+		'positionInField',
+		'noUIFlag'
 	],
 	#classVars : [
 		'Icons'
@@ -231,6 +232,13 @@ MygSkBoxElement >> initialize [
 		layout: BlSquaredLayout new
 ]
 
+{ #category : 'testing' }
+MygSkBoxElement >> isTeleport [
+    "普通箱子格子当然不是传送门。"
+    ^ false
+
+]
+
 { #category : 'geometry position' }
 MygSkBoxElement >> positionInField [
 
@@ -266,6 +274,8 @@ MygSkBoxElement >> textChild [
 MygSkBoxElement >> updateBackgroundColor [
 
 	| bg |
+	noUIFlag ifTrue: [ ^ self ].   "如果在测试模式，直接什么都不做"
+
 	bg := self box backgroundRepresentation.
 	bg class = Form ifTrue: [
 		| size boardElement space |

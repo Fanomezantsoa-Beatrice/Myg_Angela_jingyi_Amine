@@ -4,6 +4,10 @@ This class contains tests
 Class {
 	#name : 'MygSkMoveInSituationTest',
 	#superclass : 'TestCase',
+	#instVars : [
+		'player',
+		'board'
+	],
 	#category : 'Myg-Sokoban-Tests',
 	#package : 'Myg-Sokoban-Tests'
 }

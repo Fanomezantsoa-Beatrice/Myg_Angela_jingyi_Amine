@@ -62,9 +62,9 @@ MygSkGameManager class >> mazesLoma [
 	^ IdentityDictionary new
 		  at: 1 put: '##### 
 #   ####
-# #$.  #
+# #$.T #
 #  .$#@#
-###$.  #
+###$.T #
   #  ###
   #  #
   ####';

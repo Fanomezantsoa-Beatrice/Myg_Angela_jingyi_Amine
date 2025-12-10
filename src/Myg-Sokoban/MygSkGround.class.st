@@ -38,3 +38,10 @@ MygSkGround >> backgroundRepresentation [
 
 	^ Color transparent
 ]
+
+{ #category : 'testing' }
+MygSkGround >> isTeleport [
+    "我这个格子的 ground（地板）是不是传送门？"
+    ^ self backgroundLayer isTeleport
+
+]

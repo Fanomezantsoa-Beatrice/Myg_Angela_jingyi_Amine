@@ -220,6 +220,35 @@ MygSkBoard >> nextTargetNumberToFill [
 	^ filledTargets size + 1
 ]
 
+{ #category : 'as yet unclassified' }
+MygSkBoard >> otherTeleportFor: aTeleportElement [
+    | teleports |
+    teleports := self teleportElements.
+    ^ teleports
+        detect: [:each | each ~~ aTeleportElement]
+        ifNone: [ aTeleportElement ]  "sécurité si mal configuré"
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoard >> otherTeleportPositionFrom: aPoint [
+    | teleports |
+    teleports := self teleportPositions.
+    teleports size = 2 ifFalse: [ ^ aPoint ].  "sécurité si la map est mal faite"
+    ^ teleports
+        detect: [:pos | pos ~= aPoint]
+        ifNone: [ aPoint ]
+
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoard >> otherTeleportThan: aTeleport [
+    | all |
+    all := self teleports.
+    ^ all detect: [ :each | each ~= aTeleport ]
+        ifNone: [ nil ]
+
+]
+
 { #category : 'accessing' }
 MygSkBoard >> player [
 	^ player
@@ -263,22 +292,101 @@ MygSkBoard >> setPlayer [
 	player := grid contents detect: #isPlayer
 ]
 
+{ #category : 'as yet unclassified' }
+MygSkBoard >> teleportElements [
+    "Retourne la liste des tuiles de type téléporteur sur le plateau"
+    ^ self allElements select: [:each | each isTeleport]
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoard >> teleportPlayer [
+    | playerElement sourcePos destPos destBackground |
+
+    playerElement := player.        
+    playerElement ifNil: [ ^ self ].
+
+    sourcePos := playerElement position.
+    sourcePos ifNil: [ ^ self ].
+
+    destPos := self otherTeleportPositionFrom: sourcePos.
+    destPos = sourcePos ifTrue: [ ^ self ].  
+
+    
+    self
+        atColumn: sourcePos x
+        atRow: sourcePos y
+        put: playerElement background.
+
+    
+    destBackground := self
+        atColumn: destPos x
+        atRow: destPos y.
+
+   
+    playerElement
+        background: destBackground;
+        position: destPos.
+
+    
+    self
+        atColumn: destPos x
+        atRow: destPos y
+        put: playerElement.
+
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoard >> teleportPositions [
+    | positions |
+    positions := OrderedCollection new.
+    1 to: self width do: [:col |
+        1 to: self height do: [:row |
+            ((self atColumn: col atRow: row) isTeleport)
+                ifTrue: [ positions add: col@row ] ] ].
+    ^ positions
+
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoard >> teleports [
+    "返回本棋盘上所有传送门格子（通常是 2 个）。"
+    | collection |
+    collection := OrderedCollection new.
+    self do: [ :each |
+        (each isTeleport) ifTrue: [ collection add: each ] ].
+    ^ collection asArray
+
+]
+
 { #category : 'move' }
 MygSkBoard >> updatePositionOf: aSkMovable from: previousPosition [
-	"Put back the previous position element."
-	self
-		atColumn: previousPosition x
-		atRow: previousPosition y
-		put: aSkMovable background.
-	"put the current position element as previous background of the moving element."
-	aSkMovable background:
-		(self atColumn: aSkMovable position x atRow: aSkMovable position y).
-	"finally place the moving element to its new location"
-	self
-		atColumn: aSkMovable position x
-		atRow: aSkMovable position y
-		put: aSkMovable.
-	self isFinished ifTrue: [ self endGame ]
+    "Put back the previous position element."
+
+    self
+        atColumn: previousPosition x
+        atRow: previousPosition y
+        put: aSkMovable background.
+
+    "put the current position element as previous background of the moving element."
+    aSkMovable background:
+        (self
+            atColumn: aSkMovable position x
+            atRow: aSkMovable position y).
+
+    "finally place the moving element to its new location"
+    self
+        atColumn: aSkMovable position x
+        atRow: aSkMovable position y
+        put: aSkMovable.
+
+    "=== si c'est le joueur et qu'il est sur un téléport, on téléporte ==="
+    (aSkMovable == player and: [ aSkMovable background isTeleport ])
+        ifTrue: [
+            self teleportPlayer
+        ].
+
+    self isFinished ifTrue: [ self endGame ].
+
 ]
 
 { #category : 'accessing' }

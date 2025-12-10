@@ -35,7 +35,8 @@ Class {
 		'backgroundLayer',
 		'foregroundLayer',
 		'directionDict',
-		'space'
+		'space',
+		'noUIFlag'
 	],
 	#category : 'Myg-Sokoban-UI',
 	#package : 'Myg-Sokoban',
@@ -299,51 +300,74 @@ MygSkBoardElement >> initializeForegroundLayerPreview [
 	self foregroundLayer: layer
 ]
 
+{ #category : 'testing' }
+MygSkBoardElement >> isNoUI [
+	^ noUIFlag
+
+]
+
+{ #category : 'testing' }
+MygSkBoardElement >> isTeleport [
+    ^ false
+]
+
 { #category : 'initialization' }
 MygSkBoardElement >> manageEvent: anEvent [
 
-	| player moved direction neighborElement elements |
-	anEvent key name = #SPACE ifTrue: [ ^ self resetBoard ].
-	anEvent key name = #ESCAPE ifTrue: [ ^ self space close ].
-	board isFinished ifTrue: [ ^ self ].
-	player := self board player.
-	direction := self directionDict
-		             at: anEvent key name
-		             ifAbsent: [ ^ self ].
-	elements := self
-		            elementsToUpdateAtPosition: player position
-		            goingIn: direction.
-	neighborElement := elements second.
-	
-	moved := player move: direction.
+    | player moved direction neighborElement elements |
+    
+    "快捷键：重置 / 关闭窗口"
+    anEvent key name = #SPACE ifTrue: [ ^ self resetBoard ].
+    anEvent key name = #ESCAPE ifTrue: [ ^ self space close ].
+    board isFinished ifTrue: [ ^ self ].
 
-	moved ifTrue: [
-    player board gameManager
-        currentMoveCount: player board gameManager currentMoveCount + 1.
+    "1. 找到玩家和方向"
+    player := self board player.
+    direction := self directionDict
+                    at: anEvent key name
+                    ifAbsent: [ ^ self ].   "不是方向键就直接返回"
 
-].
-moved ifTrue: [
-    self board moveCount: self board moveCount + 1.
-    moveLabel text: ('Moves: ', self board moveCount asString) asRopedText
-].
+    "2. 计算这一步要刷新的元素（当前格子 + 前方格子）"
+    elements := self
+                    elementsToUpdateAtPosition: player position
+                    goingIn: direction.
+    neighborElement := elements second.
+
+    "3. 真正移动玩家 / 推箱子"
+    moved := player move: direction.
+
+    "4. 如果移动成功：步数 +1 + 更新 UI 文本"
+    moved ifTrue: [
+        self board moveCount: self board moveCount + 1.
+        moveLabel text: ('Moves: ', self board moveCount asString) asRopedText
+    ].
+
+    "5. 推箱子动画 / 普通刷新"
+    (moved and: [ neighborElement box class = MygSkBox ])
+        ifTrue: [
+            | animation |
+            animation := neighborElement
+                boxAnimationMovingInDirection: direction.
+            neighborElement addAnimation:
+                (animation onFinishedDo: [
+                    neighborElement resetAnimation.
+                    self updateElements: elements ]) ]
+        ifFalse: [
+            self updateElements: elements ].
 
 
-	(moved and: [ neighborElement box class = MygSkBox ])
-		ifTrue: [
-			| animation |
-			animation := neighborElement boxAnimationMovingInDirection:
-				             direction.
-			neighborElement addAnimation: (animation onFinishedDo: [
-					 neighborElement resetAnimation.
-					 self updateElements: elements ]) ]
-		ifFalse: [ self updateElements: elements ]
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoardElement >> noUI [
+	"在测试里调用这个方法，关闭所有 UI 更新"
+	noUIFlag := true
+
 ]
 
 { #category : 'opening' }
 MygSkBoardElement >> openWithModel: aSkBoard [
 
-    "不要写 | space | 这一行！！"
-    "这里直接给实例变量 space 赋值"
     space := BlSpace new.
     space extent: 500 @ 500.
     space resizable: false.
@@ -353,11 +377,18 @@ MygSkBoardElement >> openWithModel: aSkBoard [
 
     self board: aSkBoard.
 
- moveLabel := BlTextElement new.
-moveLabel text: 'Moves: 0' asRopedText.
+    "==== UI moveLabel ====="
+    moveLabel := BlTextElement new.
+    moveLabel text: 'Moves: 0' asRopedText.
+
+    moveLabel zIndex: 9999.   "让文字在最上层"
+    moveLabel position: 10 @ 10.   "距离左上角"
+
     space root addChild: moveLabel.
 
     space show.
+
+
 ]
 
 { #category : 'initialization' }
@@ -365,6 +396,12 @@ MygSkBoardElement >> resetBoard [
 
 	self space close.
 	self board reset
+]
+
+{ #category : 'as yet unclassified' }
+MygSkBoardElement >> teleportPlayer: aPlayer fromTeleport: aTeleportElement [
+    "TODO: 以后在这里实现真正的传送逻辑。先什么都不做，以保证程序不再报错。"
+
 ]
 
 { #category : 'private' }
