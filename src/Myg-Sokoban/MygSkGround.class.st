@@ -44,3 +44,9 @@ MygSkGround >> isTeleport [
     ^ false
 
 ]
+
+{ #category : 'accessing' }
+MygSkGround >> targets [
+    ^ self grounds select: [ :each | each isTarget ].
+
+]

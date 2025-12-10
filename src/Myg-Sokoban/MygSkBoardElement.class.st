@@ -309,7 +309,8 @@ MygSkBoardElement >> initializeForegroundLayerPreview [
 
 { #category : 'testing' }
 MygSkBoardElement >> isTeleport [
-    "当前格子的背景是不是一个传送门？"
+    "问一问自己下面的地面是不是传送门。"
+    self backgroundLayer isNil ifTrue: [ ^ false ].
     ^ self backgroundLayer isTeleport
 
 ]
@@ -319,39 +320,29 @@ MygSkBoardElement >> manageEvent: anEvent [
 
     | player moved direction neighborElement elements |
 
-    "快捷键：重置 / 关闭窗口"
     anEvent key name = #SPACE ifTrue: [ ^ self resetBoard ].
     anEvent key name = #ESCAPE ifTrue: [ ^ self space close ].
     board isFinished ifTrue: [ ^ self ].
 
-    "1. 找到玩家和方向"
     player := self board player.
     direction := self directionDict
-                    at: anEvent key name
-                    ifAbsent: [ ^ self ].   "不是方向键就直接返回"
+        at: anEvent key name
+        ifAbsent: [ ^ self ].
 
-    "2. 要刷新的格子（当前 + 前方）"
     elements := self
-                    elementsToUpdateAtPosition: player position
-                    goingIn: direction.
+        elementsToUpdateAtPosition: player position
+        goingIn: direction.
     neighborElement := elements second.
 
-    "3. 真正移动玩家 / 推箱子"
     moved := player move: direction.
 
-    "4. 移动成功：步数 +1 + 更新 UI 文本"
     moved ifTrue: [
+        player board gameManager
+            currentMoveCount: player board gameManager currentMoveCount + 1.
         self board moveCount: self board moveCount + 1.
         moveLabel text: ('Moves: ', self board moveCount asString) asRopedText
     ].
 
-    "5. 如果踩到传送门，就传送，然后结束（不用下面的动画）"
-    (moved and: [ neighborElement isTeleport ]) ifTrue: [
-        self teleportPlayer: player fromTeleport: neighborElement.
-        ^ self
-    ].
-
-    "6. 推箱子动画 / 普通刷新"
     (moved and: [ neighborElement box class = MygSkBox ])
         ifTrue: [
             | animation |
@@ -396,27 +387,15 @@ MygSkBoardElement >> resetBoard [
 ]
 
 { #category : 'as yet unclassified' }
-MygSkBoardElement >> teleportPlayer: aPlayer fromTeleport: aBoxElement [
-    "玩家站在 aBoxElement（一个传送门格子）上时，把他传送到另外一个传送门。"
+MygSkBoardElement >> teleportPlayer: aPlayer fromTeleport: aTeleportCell [
+    "aTeleportCell 是 MygSkBoxElement（上面是角色，下面 ground 是 MygSkTeleport）"
 
-    | otherTeleport targetPosition elementsToUpdate |
+    | ground |
+    ground := aTeleportCell backgroundLayer.
+    ground teleportPlayer: aPlayer.   "改模型里的坐标"
 
-    "1. 找到另外一个传送门格子"
-    otherTeleport := self allBoxElements
-        detect: [ :each |
-            each ~~ aBoxElement
-                and: [ each isTeleport ] ]
-        ifNone: [ ^ self ].   "只有一个 T 的话，什么都不做"
-
-    "2. 得到目标位置（model 上的坐标）"
-    targetPosition := otherTeleport model position.
-
-    "3. 改玩家的 model 位置"
-    aPlayer position: targetPosition.
-
-    "4. 刷新两个传送门所在的格子"
-    elementsToUpdate := { aBoxElement. otherTeleport }.
-    self updateElements: elementsToUpdate.
+    "模型已经变了，直接整盘重画，最省心"
+    self resetBoard
 
 ]
 

@@ -98,6 +98,12 @@ MygSkObject >> isTarget [
 	^ false
 ]
 
+{ #category : 'testing' }
+MygSkObject >> isTeleport [
+    ^ false
+
+]
+
 { #category : 'move' }
 MygSkObject >> moveIn: aNeighbor going: aDirection [
 	"To move in a position, we ask the entity where we want to get in to decide.

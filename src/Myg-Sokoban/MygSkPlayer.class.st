@@ -27,7 +27,8 @@ Class {
 	#name : 'MygSkPlayer',
 	#superclass : 'MygSkMovable',
 	#instVars : [
-		'facing'
+		'facing',
+		'teleportCooldown'
 	],
 	#category : 'Myg-Sokoban-Model',
 	#package : 'Myg-Sokoban',
@@ -67,7 +68,8 @@ MygSkPlayer >> facing: aCpDirection [
 MygSkPlayer >> initialize [ 
 
 	super initialize.
-	facing := CpSouthDirection
+	facing := CpSouthDirection.
+	teleportCooldown := false.
 ]
 
 { #category : 'move' }
@@ -79,7 +81,21 @@ MygSkPlayer >> isPlayer [
 MygSkPlayer >> move: aCpDirection [
 
 	self facing: aCpDirection class.
-	^ super move: aCpDirection
+	^ super move: aCpDirection.
+	teleportCooldown := false.
+
+]
+
+{ #category : 'accessing' }
+MygSkPlayer >> teleportCooldown [
+	^ teleportCooldown
+
+]
+
+{ #category : 'accessing' }
+MygSkPlayer >> teleportCooldown: aBoolean [
+	teleportCooldown := aBoolean
+
 ]
 
 { #category : 'default encoding' }

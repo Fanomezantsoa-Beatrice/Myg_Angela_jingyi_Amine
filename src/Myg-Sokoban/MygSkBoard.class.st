@@ -269,6 +269,18 @@ MygSkBoard >> setPlayer [
 	player := grid contents detect: #isPlayer
 ]
 
+{ #category : 'as yet unclassified' }
+MygSkBoard >> teleports [
+    "返回棋盘上所有 teleport ground 格子"
+    | result |
+    result := OrderedCollection new.
+    grid do: [:each |
+        (each notNil and: [ each isTeleport ]) ifTrue: [
+            result add: each ] ].
+    ^ result
+
+]
+
 { #category : 'move' }
 MygSkBoard >> updatePositionOf: aSkMovable from: previousPosition [
 	"Put back the previous position element."
