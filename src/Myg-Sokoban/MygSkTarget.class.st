@@ -24,7 +24,8 @@ Class {
 	#name : 'MygSkTarget',
 	#superclass : 'MygSkObject',
 	#instVars : [
-		'number'
+		'number',
+		'pairStrategy'
 	],
 	#classVars : [
 		'TargetCounter'
@@ -122,15 +123,27 @@ MygSkTarget >> bringIn: aSkMovable going: aDirection [
 	^ super bringIn: aSkMovable going: aDirection
 ]
 
-{ #category : 'accessing' }
+{ #category : 'initialization' }
 MygSkTarget >> initialize [
-	super initialize.
-	number := self class nextNumber
+    super initialize.
+	 TargetCounter := 0.
+    pairStrategy := PairStrategy new.
+]
+
+{ #category : 'accessing' }
+MygSkTarget >> isPaired [
+    ^ pairStrategy isPaired
 ]
 
 { #category : 'move' }
 MygSkTarget >> isTarget [ 
 	^ true
+]
+
+{ #category : 'accessing' }
+MygSkTarget >> isUnpaired [
+    ^ pairStrategy isUnpaired
+
 ]
 
 { #category : 'accessing' }
@@ -141,4 +154,16 @@ MygSkTarget >> number [
 { #category : 'accessing' }
 MygSkTarget >> number: anInteger [
 	number := anInteger
+]
+
+{ #category : 'accessing' }
+MygSkTarget >> pairId [
+    ^ pairStrategy pairId
+
+]
+
+{ #category : 'accessing' }
+MygSkTarget >> pairId: anId [
+    pairStrategy pairId: anId
+
 ]

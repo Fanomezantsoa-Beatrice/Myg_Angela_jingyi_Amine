@@ -23,6 +23,9 @@ Internal Representation and Key Implementation Points.
 Class {
 	#name : 'MygSkBox',
 	#superclass : 'MygSkMovable',
+	#instVars : [
+		'pairStrategy'
+	],
 	#category : 'Myg-Sokoban-Model',
 	#package : 'Myg-Sokoban',
 	#tag : 'Model'
@@ -61,10 +64,36 @@ MygSkBox >> bringIn: aPlayer going: aDirection [
 	^ didMove
 ]
 
+{ #category : 'initialization' }
+MygSkBox >> initialize [
+    super initialize.
+    pairStrategy := PairStrategy new.
+]
+
 { #category : 'move' }
 MygSkBox >> isBox [ 
 
 	^ true
+]
+
+{ #category : 'initialization' }
+MygSkBox >> isPaired [
+    ^ pairStrategy isPaired
+]
+
+{ #category : 'initialization' }
+MygSkBox >> isUnpaired [
+    ^ pairStrategy isUnpaired
+]
+
+{ #category : 'initialization' }
+MygSkBox >> pairId [
+    ^ pairStrategy pairId
+]
+
+{ #category : 'initialization' }
+MygSkBox >> pairId: anId [
+    pairStrategy pairId: anId
 ]
 
 { #category : 'default encoding' }
