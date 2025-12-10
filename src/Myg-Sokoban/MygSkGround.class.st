@@ -38,3 +38,9 @@ MygSkGround >> backgroundRepresentation [
 
 	^ Color transparent
 ]
+
+{ #category : 'testing' }
+MygSkGround >> isTeleport [
+    ^ false
+
+]

@@ -231,6 +231,13 @@ MygSkBoxElement >> initialize [
 		layout: BlSquaredLayout new
 ]
 
+{ #category : 'testing' }
+MygSkBoxElement >> isTeleport [
+    "A box cell is never a teleport."
+    ^ false
+
+]
+
 { #category : 'geometry position' }
 MygSkBoxElement >> positionInField [
 
