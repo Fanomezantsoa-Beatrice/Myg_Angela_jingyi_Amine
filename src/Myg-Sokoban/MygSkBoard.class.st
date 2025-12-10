@@ -271,13 +271,13 @@ MygSkBoard >> setPlayer [
 
 { #category : 'as yet unclassified' }
 MygSkBoard >> teleports [
-    "返回棋盘上所有 teleport ground 格子"
-    | result |
-    result := OrderedCollection new.
-    grid do: [:each |
-        (each notNil and: [ each isTeleport ]) ifTrue: [
-            result add: each ] ].
-    ^ result
+	| result |
+	result := OrderedCollection new.
+	grid do: [:each |
+		(each respondsTo: #isTeleport) ifTrue: [
+			each isTeleport ifTrue: [
+				result add: each ] ] ].
+	^ result
 
 ]
 

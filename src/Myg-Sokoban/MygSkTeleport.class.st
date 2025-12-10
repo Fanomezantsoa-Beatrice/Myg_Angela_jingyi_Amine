@@ -39,11 +39,9 @@ MygSkTeleport >> isTeleport [
 
 { #category : 'as yet unclassified' }
 MygSkTeleport >> otherTeleport [
-    "找到和我成对的另一个 teleport（同一个 board 上）"
-    | ts |
-    ts := self board teleports.
-    ts size < 2 ifTrue: [ ^ nil ].  "没有成对的就不传送"
-    ^ ts detect: [:t | t ~~ self] ifNone: [ nil ]
+	^ self board teleports
+		detect: [:t | t ~~ self ]
+		ifNone: [ nil ]
 
 ]
 
@@ -55,23 +53,26 @@ MygSkTeleport >> partner [
 { #category : 'as yet unclassified' }
 MygSkTeleport >> teleportPlayer: aPlayer [
 
-	| board prev other |
-	"Already teleported this move?"
-	(aPlayer teleportCooldown) ifTrue: [ ^ self ].
+	| board previous position other |
+	
+	"cooldown: avoid bouncing loop"
+	(aPlayer teleportCooldown = true) ifTrue: [ ^ self ].
 
 	aPlayer teleportCooldown: true.
 
-
 	board := self board.
 
-	"Find the other teleport"
-	other := self otherTeleport.
-	other ifNil: [ ^ self ].
+	previous := aPlayer position.
 
-	"Teleport"
-	prev := aPlayer position.
+	other := self otherTeleport ifNil: [ ^ self ].
+
 	aPlayer basicPosition: other position.
-	board updatePositionOf: aPlayer from: prev.
+
+	board updatePositionOf: aPlayer from: previous.
+
+	"Clear cooldown after one cycle"
+	aPlayer teleportCooldown: false.
+
 
 
 ]
