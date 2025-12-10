@@ -23,6 +23,18 @@ MygSkGameLogic >> setUp [
 ]
 
 { #category : 'tests' }
+MygSkGameLogic >> testBoxMatchesTarget [
+    | box target |
+    box := MygSkBox new.
+    target := MygSkTarget new.
+    box pairId: 1.
+    target pairId: 1.
+    self assert: box isPaired.
+    self assert: target isPaired.
+    self assert: box pairId equals: target pairId.
+]
+
+{ #category : 'tests' }
 MygSkGameLogic >> testIsFinished [
 
 	self deny: board isFinished.
