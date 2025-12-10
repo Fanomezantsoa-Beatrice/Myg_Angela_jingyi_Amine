@@ -245,6 +245,12 @@ MygSkBoard >> printOn: aStream [
 		separatedBy: [ aStream cr ]
 ]
 
+{ #category : 'as yet unclassified' }
+MygSkBoard >> registerMove [
+    self moveCount: self moveCount + 1.
+
+]
+
 { #category : 'initialization' }
 MygSkBoard >> reset [
 
